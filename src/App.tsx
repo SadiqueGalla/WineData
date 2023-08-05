@@ -1,24 +1,33 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
+import data from "./Data/Wine-Data.json"
+import Properties from "./Types/Properties"
+import calculateAlcoholClassses from './Utils/CalculateAlcoholClassses';
+import Statistics from './Components/Statistics';
+
+
 function App() {
+
+  //Coverting the all data to Number and also adding up gamma property for the dataset
+ const properties:Properties[]=data.map((wine:any)=>{
+   const returnObject:any={}
+   for(const i in wine){
+     returnObject[i]=Number(wine[i])
+   }
+   const {Ash,Hue,Magnesium}=returnObject;
+   returnObject["Gamma"]=parseFloat(((Ash * Hue) / Magnesium).toFixed(2));
+   return returnObject;
+ });  
+ 
+ //Calculate unique classes of alchohol
+ const classes:number[]=calculateAlcoholClassses(properties);
+ 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        {/* Using Statistics component to calculate and render the statistics of "Flavanoids" and "Gamma" properties */}
+       <Statistics properties={properties} classes={classes} propertyName={"Flavanoids"}/>
+       <Statistics properties={properties} classes={classes} propertyName={"Gamma"} />
     </div>
   );
 }
